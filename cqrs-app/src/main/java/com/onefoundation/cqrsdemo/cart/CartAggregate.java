@@ -1,9 +1,9 @@
 package com.onefoundation.cqrsdemo.cart;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -22,45 +22,62 @@ public class CartAggregate {
 	
 	@Autowired
 	private CartEventSequenceNumber cartEventSequenceNumber;
+	@Autowired
+	CartStore cartStore;
+	private Cart cart;
+	@Autowired
+	EventStore eventStore;
+	String cartId;
 	
-	private String id;
-	private Map<String,CartItem> items = new HashMap<String,CartItem>();
-	
-	public CartAggregate(String id) {
-		this.id = id;
+	public CartAggregate(String cartId) {
+		this.cartId = cartId;
 	}
 	
-	
-	public String getId() {
-		return id;
+	public Cart getCart() {
+		return cart;
 	}
-
+	
+	public void refresh() {
+		List<Event> events = eventStore.getCartEvents(cart.getId(), cart.getSnapshotEventSequenceNumber());
+		if(!events.isEmpty()) {
+			for (Event e : events) {
+				apply(e);
+			}
+		}
+		cartStore.save(cart);
+	}
+	
 	public void apply(Event event) {
+		if (event == null) {
+			return;
+		}
+		
 		if (event instanceof ItemAddedEvent) {
 			apply((ItemAddedEvent)event);
 		} else if (event instanceof ItemUpdatedEvent) {
 			apply((ItemUpdatedEvent)event);
 		}
+		cart.setSnapshotEventSequenceNumber(event.getSequenceNumber());
 	}
 
 	public void apply(ItemAddedEvent event) {
 		
-		if(items.containsKey(event.getSkuId())) {
-			int newQuantity = items.get(event.getSkuId()).getQuantity() + event.getQuantity();
-			items.get(event.getSkuId()).setQuantity(newQuantity);
+		if(cart.getItems().containsKey(event.getSkuId())) {
+			int newQuantity = cart.getItems().get(event.getSkuId()).getQuantity() + event.getQuantity();
+			cart.getItems().get(event.getSkuId()).setQuantity(newQuantity);
 		} else {
 			CartItem item = new CartItem(event.getSkuId(), event.getQuantity());
-			items.put(event.getSkuId(), item);
+			cart.getItems().put(event.getSkuId(), item);
 		}
 	}
 	
 	public void apply(ItemUpdatedEvent event) {
 		
-		if(items.containsKey(event.getSkuId())) {
+		if(cart.getItems().containsKey(event.getSkuId())) {
 			if (event.getQuantity() == 0) {
-				items.remove(event.getSkuId());
+				cart.getItems().remove(event.getSkuId());
 			} else {
-				items.get(event.getSkuId()).setQuantity(event.getQuantity());
+				cart.getItems().get(event.getSkuId()).setQuantity(event.getQuantity());
 			}
 		}
 	}
@@ -79,7 +96,7 @@ public class CartAggregate {
 		
 		ItemAddedEvent event = new ItemAddedEvent();
 		event.setSequenceNumber(cartEventSequenceNumber.getNextSequenceNumber());
-		event.setCartId(id);
+		event.setCartId(cart.getId());
 		event.setQuantity(command.getQuantity());
 		event.setSkuId(command.getSkuId());
 		
@@ -96,7 +113,7 @@ public class CartAggregate {
 			throw new IllegalArgumentException("New quantity can not be negative.");
 		}
 		
-		if(!items.containsKey(command.getSkuId())) {
+		if(!cart.getItems().containsKey(command.getSkuId())) {
 			throw new IllegalStateException("Item {"+command.getSkuId()+"} does not exit in the cart. Can not update item.");
 		}
 		
@@ -105,7 +122,7 @@ public class CartAggregate {
 		
 		ItemUpdatedEvent event = new ItemUpdatedEvent();
 		event.setSequenceNumber(cartEventSequenceNumber.getNextSequenceNumber());
-		event.setCartId(id);
+		event.setCartId(cart.getId());
 		event.setQuantity(command.getQuantity());
 		event.setSkuId(command.getSkuId());
 
@@ -114,13 +131,12 @@ public class CartAggregate {
 
 	}
 	
-	public CartAggregate newInstance(String id) {
-		
-		return null;
+	@PostConstruct
+	private void init() {
+		cart = cartStore.get(cartId);
+		if (cart == null) {
+			cart = new Cart(cartId);
+		}
+		refresh();
 	}
-	
-	public Map<String,CartItem> getItems() {
-		return this.items;
-	}
-	
 }

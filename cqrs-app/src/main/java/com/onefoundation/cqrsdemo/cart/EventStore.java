@@ -19,17 +19,19 @@ import com.onefoundation.cqrsdemo.cart.removeitem.ItemUpdatedEvent;
 import com.onefoundation.cqrsdemo.db.Couchbase;
 
 @Service
-public class CartEventDAO {
+public class EventStore {
 	
 	ObjectMapper mapper = new ObjectMapper();
 	@Autowired
 	Couchbase db;
 	
-	public List<Event> getCartEvents(String cartId) {
+	public List<Event> getCartEvents(String cartId, long snapshotEventSequenceNumber) {
 		
 		N1qlParams params = N1qlParams.build().adhoc(false);
-    	JsonObject values = JsonObject.create().put("cartId", cartId);
-    	N1qlQuery query = N1qlQuery.parameterized("select default.* from `default` where docType='CartEvent' and cartId=$cartId order by sequenceNumber", values, params);
+    	JsonObject values = JsonObject.create().put("cartId", cartId)
+    						.put("snapshotEventSequenceNumber", snapshotEventSequenceNumber);
+    	
+    	N1qlQuery query = N1qlQuery.parameterized("select default.* from `default` where docType='CartEvent' and cartId=$cartId and sequenceNumber > $snapshotEventSequenceNumber order by sequenceNumber", values, params);
     	
 		List<Event> events = db.getBucket().async().query(query)
          .flatMap(AsyncN1qlQueryResult::rows)
@@ -66,7 +68,7 @@ public class CartEventDAO {
 	private Event createEvent(String json) {
 		Event event = null;
 		try {
-			if(json.contains("ItemRemovedEvent")) {
+			if(json.contains("ItemUpdatedEvent")) {
 				event =  mapper.readValue(json, ItemUpdatedEvent.class);
 			} else if (json.contains("ItemAddedEvent")) {
 				event =  mapper.readValue(json, ItemAddedEvent.class);

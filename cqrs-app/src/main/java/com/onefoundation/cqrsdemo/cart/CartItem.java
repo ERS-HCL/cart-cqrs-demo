@@ -5,6 +5,9 @@ public class CartItem {
 	private String skuId;
 	private int quantity;
 	
+	public CartItem() {
+	}
+	
 	public CartItem(String skuId, int quantity) {
 		this.skuId = skuId;
 		this.quantity = quantity;
