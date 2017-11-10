@@ -1,15 +1,15 @@
-package com.onefoundation.cqrsdemo.cart;
+package com.onefoundation.cqrsdemo.cart.store;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Cart {
 	
-	private String docType = "Cart";
+	private String docType = DocTypes.Cart.name();
 	
 	private String id;
 	private Map<String, CartItem> items = new HashMap<String, CartItem>();
-	private long snapshotEventSequenceNumber;
+	private long snapshotEventNumber;
 	
 	public Cart() {
 	}
@@ -30,8 +30,8 @@ public class Cart {
 		return items;
 	}
 
-	public long getSnapshotEventSequenceNumber() {
-		return snapshotEventSequenceNumber;
+	public long getSnapshotEventNumber() {
+		return snapshotEventNumber;
 	}
 
 	public void setDocType(String docType) {
@@ -46,8 +46,8 @@ public class Cart {
 		this.items = items;
 	}
 
-	public void setSnapshotEventSequenceNumber(long snapshotEventSequenceNumber) {
-		this.snapshotEventSequenceNumber = snapshotEventSequenceNumber;
+	public void setSnapshotEventNumber(long snapshotEventNumber) {
+		this.snapshotEventNumber = snapshotEventNumber;
 	}
 	
 }

@@ -1,4 +1,4 @@
-package com.onefoundation.cqrsdemo.cart;
+package com.onefoundation.cqrsdemo.cart.store;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -11,9 +11,9 @@ import com.couchbase.client.java.document.json.JsonObject;
 import com.couchbase.client.java.query.AsyncN1qlQueryResult;
 import com.couchbase.client.java.query.N1qlParams;
 import com.couchbase.client.java.query.N1qlQuery;
+import com.couchbase.client.java.query.consistency.ScanConsistency;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.onefoundation.cqrsdemo.db.Couchbase;
 
 @Service
 public class CartStore {
@@ -36,7 +36,7 @@ public class CartStore {
 	
 	public Cart get(String cartId) {
 		
-		N1qlParams params = N1qlParams.build().adhoc(false);
+		N1qlParams params = N1qlParams.build().adhoc(false).consistency(ScanConsistency.STATEMENT_PLUS);
     	JsonObject values = JsonObject.create().put("id", cartId);
     	N1qlQuery query = N1qlQuery.parameterized("select default.* from `default` where docType='Cart' and id=$id", values, params);
     	

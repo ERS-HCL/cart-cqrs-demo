@@ -1,12 +1,12 @@
-package com.onefoundation.cqrsdemo;
+package com.onefoundation.cqrsdemo.cart;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CqrsDemoApplication {
+public class Application {
 
 	public static void main(String[] args) {
-		SpringApplication.run(CqrsDemoApplication.class, args);
+		SpringApplication.run(Application.class, args);
 	}
 }

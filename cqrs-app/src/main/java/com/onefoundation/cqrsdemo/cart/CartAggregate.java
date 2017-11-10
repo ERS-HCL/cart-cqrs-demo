@@ -9,19 +9,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.onefoundation.cqrsdemo.cart.additem.AddItemCommand;
-import com.onefoundation.cqrsdemo.cart.additem.ItemAddedEvent;
-import com.onefoundation.cqrsdemo.cart.event.CartEventSequenceNumber;
-import com.onefoundation.cqrsdemo.cart.event.Event;
-import com.onefoundation.cqrsdemo.cart.removeitem.ItemUpdatedEvent;
-import com.onefoundation.cqrsdemo.cart.removeitem.UpdateItemCommand;
+import com.onefoundation.cqrsdemo.cart.command.Event;
+import com.onefoundation.cqrsdemo.cart.command.additem.AddItemCommand;
+import com.onefoundation.cqrsdemo.cart.command.additem.ItemAddedEvent;
+import com.onefoundation.cqrsdemo.cart.command.removeitem.ItemUpdatedEvent;
+import com.onefoundation.cqrsdemo.cart.command.removeitem.UpdateItemCommand;
+import com.onefoundation.cqrsdemo.cart.store.Cart;
+import com.onefoundation.cqrsdemo.cart.store.CartEventNumber;
+import com.onefoundation.cqrsdemo.cart.store.CartItem;
+import com.onefoundation.cqrsdemo.cart.store.CartStore;
+import com.onefoundation.cqrsdemo.cart.store.EventStore;
 
 @Service
 @Scope("prototype")
 public class CartAggregate {
 	
 	@Autowired
-	private CartEventSequenceNumber cartEventSequenceNumber;
+	private CartEventNumber cartEventNumber;
 	@Autowired
 	CartStore cartStore;
 	private Cart cart;
@@ -38,7 +42,7 @@ public class CartAggregate {
 	}
 	
 	public void refresh() {
-		List<Event> events = eventStore.getCartEvents(cart.getId(), cart.getSnapshotEventSequenceNumber());
+		List<Event> events = eventStore.getCartEvents(cart.getId(), cart.getSnapshotEventNumber());
 		if(!events.isEmpty()) {
 			for (Event e : events) {
 				apply(e);
@@ -57,7 +61,7 @@ public class CartAggregate {
 		} else if (event instanceof ItemUpdatedEvent) {
 			apply((ItemUpdatedEvent)event);
 		}
-		cart.setSnapshotEventSequenceNumber(event.getSequenceNumber());
+		cart.setSnapshotEventNumber(event.getEventNumber());
 	}
 
 	public void apply(ItemAddedEvent event) {
@@ -95,7 +99,7 @@ public class CartAggregate {
 		List<Event> events = new ArrayList<Event>();
 		
 		ItemAddedEvent event = new ItemAddedEvent();
-		event.setSequenceNumber(cartEventSequenceNumber.getNextSequenceNumber());
+		event.setSequenceNumber(cartEventNumber.getNextEventNumber());
 		event.setCartId(cart.getId());
 		event.setQuantity(command.getQuantity());
 		event.setSkuId(command.getSkuId());
@@ -121,7 +125,7 @@ public class CartAggregate {
 		List<Event> events = new ArrayList<Event>();
 		
 		ItemUpdatedEvent event = new ItemUpdatedEvent();
-		event.setSequenceNumber(cartEventSequenceNumber.getNextSequenceNumber());
+		event.setSequenceNumber(cartEventNumber.getNextEventNumber());
 		event.setCartId(cart.getId());
 		event.setQuantity(command.getQuantity());
 		event.setSkuId(command.getSkuId());

@@ -1,13 +1,15 @@
-package com.onefoundation.cqrsdemo.cart.event;
+package com.onefoundation.cqrsdemo.cart.command;
 
 import java.util.UUID;
 
+import com.onefoundation.cqrsdemo.cart.store.DocTypes;
+
 public abstract class AbstractCartEvent implements Event {
 	
-	private String docType = "CartEvent";
+	private String docType = DocTypes.CartEvent.name();
 	private long timestamp = System.currentTimeMillis();
 	private String eventId = UUID.randomUUID().toString();
-	private long sequenceNumber;
+	private long eventNumber;
 	
 	private String cartId;	
 	
@@ -51,11 +53,11 @@ public abstract class AbstractCartEvent implements Event {
 		this.timestamp = timestamp;
 	}
 
-	public long getSequenceNumber() {
-		return sequenceNumber;
+	public long getEventNumber() {
+		return eventNumber;
 	}
 
-	public void setSequenceNumber(long sequenceNumber) {
-		this.sequenceNumber = sequenceNumber;
+	public void setSequenceNumber(long eventNumber) {
+		this.eventNumber = eventNumber;
 	}
 }

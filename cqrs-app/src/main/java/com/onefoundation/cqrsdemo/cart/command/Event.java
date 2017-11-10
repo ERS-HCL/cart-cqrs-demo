@@ -1,8 +1,8 @@
-package com.onefoundation.cqrsdemo.cart.event;
+package com.onefoundation.cqrsdemo.cart.command;
 
 public interface Event {
 	
-	long getSequenceNumber();
+	long getEventNumber();
 	void setSequenceNumber(long sequenceNumber);
 	
 	String getCartId();

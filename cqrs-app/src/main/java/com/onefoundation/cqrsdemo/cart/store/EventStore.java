@@ -1,4 +1,4 @@
-package com.onefoundation.cqrsdemo.cart;
+package com.onefoundation.cqrsdemo.cart.store;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -11,12 +11,12 @@ import com.couchbase.client.java.document.json.JsonObject;
 import com.couchbase.client.java.query.AsyncN1qlQueryResult;
 import com.couchbase.client.java.query.N1qlParams;
 import com.couchbase.client.java.query.N1qlQuery;
+import com.couchbase.client.java.query.consistency.ScanConsistency;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.onefoundation.cqrsdemo.cart.additem.ItemAddedEvent;
-import com.onefoundation.cqrsdemo.cart.event.Event;
-import com.onefoundation.cqrsdemo.cart.removeitem.ItemUpdatedEvent;
-import com.onefoundation.cqrsdemo.db.Couchbase;
+import com.onefoundation.cqrsdemo.cart.command.Event;
+import com.onefoundation.cqrsdemo.cart.command.additem.ItemAddedEvent;
+import com.onefoundation.cqrsdemo.cart.command.removeitem.ItemUpdatedEvent;
 
 @Service
 public class EventStore {
@@ -27,11 +27,11 @@ public class EventStore {
 	
 	public List<Event> getCartEvents(String cartId, long snapshotEventSequenceNumber) {
 		
-		N1qlParams params = N1qlParams.build().adhoc(false);
+		N1qlParams params = N1qlParams.build().adhoc(false).consistency(ScanConsistency.STATEMENT_PLUS);
     	JsonObject values = JsonObject.create().put("cartId", cartId)
-    						.put("snapshotEventSequenceNumber", snapshotEventSequenceNumber);
+    						.put("snapshotEventNumber", snapshotEventSequenceNumber);
     	
-    	N1qlQuery query = N1qlQuery.parameterized("select default.* from `default` where docType='CartEvent' and cartId=$cartId and sequenceNumber > $snapshotEventSequenceNumber order by sequenceNumber", values, params);
+    	N1qlQuery query = N1qlQuery.parameterized("select default.* from `default` where docType='CartEvent' and cartId=$cartId and eventNumber > $snapshotEventNumber order by eventNumber", values, params);
     	
 		List<Event> events = db.getBucket().async().query(query)
          .flatMap(AsyncN1qlQueryResult::rows)

@@ -1,4 +1,4 @@
-package com.onefoundation.cqrsdemo.cart.additem;
+package com.onefoundation.cqrsdemo.cart.command.removeitem;
 
 import java.util.List;
 
@@ -14,22 +14,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onefoundation.cqrsdemo.cart.CartAggregate;
-import com.onefoundation.cqrsdemo.cart.EventStore;
-import com.onefoundation.cqrsdemo.cart.event.Event;
+import com.onefoundation.cqrsdemo.cart.command.Event;
+import com.onefoundation.cqrsdemo.cart.store.EventStore;
 
 @RestController
-public class AddItemController {
+public class UpdateItemController {
 	@Autowired
 	private ApplicationContext applicationContext;
 	@Autowired
 	EventStore eventStore;
 	ObjectMapper mapper = new ObjectMapper();
 	
-	@RequestMapping(value = "/cart/{cartId}/item/add", method=RequestMethod.POST)
+	@RequestMapping(value = "/cart/{cartId}/item/update", method=RequestMethod.POST)
 	@ResponseStatus(HttpStatus.OK)
-	public Object handle(@PathVariable("cartId") String cartId, @RequestBody AddItemCommand addItemCommand) {
+	public Object handle(@PathVariable("cartId") String cartId, @RequestBody UpdateItemCommand updateItemCommand) {
 		CartAggregate cart = applicationContext.getBean(CartAggregate.class, cartId);
-		List<Event> events = cart.handle(addItemCommand);
+		List<Event> events = cart.handle(updateItemCommand);
 		eventStore.save(events);
 		
 		cart.refresh();

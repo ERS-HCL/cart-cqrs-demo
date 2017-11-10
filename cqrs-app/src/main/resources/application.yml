@@ -13,3 +13,6 @@ spring:
 
 server:  
   port: ${PORT:8080}
+
+couchbase:
+  connectionString: couchbase://localhost
