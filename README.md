@@ -1,2 +1,2 @@
 # cqrs-demo
-A reference CQRS implementation using Spring Cloud Stream, Kafka and CouchBase
+A reference Ecommerce Cart micro service implementation using CQRS, Springboot and CouchBase
