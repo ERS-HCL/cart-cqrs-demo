@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.couchbase.client.java.document.RawJsonDocument;
@@ -25,13 +26,16 @@ public class EventStore {
 	@Autowired
 	Couchbase db;
 	
+	@Value("${couchbase.eventBucketName}")
+	private String eventBucketName;
+	
 	public List<Event> getCartEvents(String cartId, long snapshotEventSequenceNumber) {
 		
 		N1qlParams params = N1qlParams.build().adhoc(false).consistency(ScanConsistency.STATEMENT_PLUS);
     	JsonObject values = JsonObject.create().put("cartId", cartId)
     						.put("snapshotEventNumber", snapshotEventSequenceNumber);
     	
-    	N1qlQuery query = N1qlQuery.parameterized("select default.* from `default` where docType='CartEvent' and cartId=$cartId and eventNumber > $snapshotEventNumber order by eventNumber", values, params);
+    	N1qlQuery query = N1qlQuery.parameterized("select "+ eventBucketName +".* from `"+ eventBucketName +"` where docType='CartEvent' and cartId=$cartId and eventNumber > $snapshotEventNumber order by eventNumber", values, params);
     	
 		List<Event> events = db.getBucket().async().query(query)
          .flatMap(AsyncN1qlQueryResult::rows)

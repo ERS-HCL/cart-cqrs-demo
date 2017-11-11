@@ -16,3 +16,5 @@ server:
 
 couchbase:
   connectionString: couchbase://localhost
+  eventBucketName: default
+  cartBucketName: default

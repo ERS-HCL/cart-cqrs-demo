@@ -14,7 +14,7 @@ public class CartEventNumber {
 	public CartEventNumber(@Autowired Couchbase db) {
 		this.db = db;
 		try {
-			db.getBucket().counter(eventNumberSequenceName, 0, 1);
+			db.getBucket().counter(eventNumberSequenceName, 0, 0);
 		} catch (DocumentDoesNotExistException e) {
 			e.printStackTrace();
 		}
