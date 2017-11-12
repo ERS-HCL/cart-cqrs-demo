@@ -1,11 +1,8 @@
-package com.onefoundation.cqrsdemo.cart.command.additem;
+package com.hcl.ers.demo.cqrs.event.cart.v1;
 
-import com.onefoundation.cqrsdemo.cart.command.AbstractCartEvent;
-import com.onefoundation.cqrsdemo.cart.command.EventNames;
-
-public class ItemAddedEvent extends AbstractCartEvent {
+public class ItemUpdatedEvent extends AbstractCartEvent {
 	
-	private String eventName = EventNames.ItemAddedEvent.name();
+	private String eventName = EventType.ItemUpdatedEvent.name();
 	
 	private String skuId;
 	private int quantity;

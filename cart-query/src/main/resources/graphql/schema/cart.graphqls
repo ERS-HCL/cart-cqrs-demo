@@ -1,0 +1,18 @@
+schema {
+    query: QueryType
+}
+
+type QueryType {
+    cart(id: String) : Cart
+}
+
+
+type Cart {
+    id: String!
+    items: [Item]
+}
+
+type Item {
+    skuId:String
+    quantity:String
+}

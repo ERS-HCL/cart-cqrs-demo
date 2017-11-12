@@ -1,4 +1,4 @@
-package com.onefoundation.cqrsdemo.cart.store;
+package com.onefoundation.cqrsdemo.cart.model;
 
 public class CartItem {
 	

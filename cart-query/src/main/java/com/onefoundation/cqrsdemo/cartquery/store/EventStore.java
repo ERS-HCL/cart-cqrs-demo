@@ -1,4 +1,4 @@
-package com.onefoundation.cqrsdemo.cart.store;
+package com.onefoundation.cqrsdemo.cartquery.store;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;

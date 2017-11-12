@@ -1,12 +1,12 @@
-package com.onefoundation.cqrsdemo.cart.command;
+package com.hcl.ers.demo.cqrs.event.cart.v1;
 
 import java.util.UUID;
 
-import com.onefoundation.cqrsdemo.cart.store.DocTypes;
+import com.hcl.ers.demo.cqrs.event.Event;
 
 public abstract class AbstractCartEvent implements Event {
 	
-	private String docType = DocTypes.CartEvent.name();
+	private String docType = CartEventDocTypes.CartEvent.name();
 	private long timestamp = System.currentTimeMillis();
 	private String eventId = UUID.randomUUID().toString();
 	private long eventNumber;

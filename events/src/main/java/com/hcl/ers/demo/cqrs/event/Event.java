@@ -1,4 +1,4 @@
-package com.onefoundation.cqrsdemo.cart.command;
+package com.hcl.ers.demo.cqrs.event;
 
 public interface Event {
 	

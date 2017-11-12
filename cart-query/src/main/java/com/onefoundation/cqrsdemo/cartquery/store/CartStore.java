@@ -1,4 +1,4 @@
-package com.onefoundation.cqrsdemo.cart.store;
+package com.onefoundation.cqrsdemo.cartquery.store;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -15,7 +15,7 @@ import com.couchbase.client.java.query.N1qlQuery;
 import com.couchbase.client.java.query.consistency.ScanConsistency;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.onefoundation.cqrsdemo.cart.model.Cart;
+import com.onefoundation.cqrsdemo.cartquery.model.Cart;
 
 @Service
 public class CartStore {
@@ -42,7 +42,7 @@ public class CartStore {
 		
 		N1qlParams params = N1qlParams.build().adhoc(false).consistency(ScanConsistency.STATEMENT_PLUS);
     	JsonObject values = JsonObject.create().put("id", cartId);
-    	N1qlQuery query = N1qlQuery.parameterized("select "+ cartBucketName + ".* from `" + cartBucketName + "` where docType='"+ DocTypes.CartAggregateView.name() +"' and id=$id", values, params);
+    	N1qlQuery query = N1qlQuery.parameterized("select "+ cartBucketName + ".* from `" + cartBucketName + "` where docType='" + DocTypes.CartQueryView.name()+ "' and id=$id", values, params);
     	
 		List<Cart> carts = db.getBucket().async().query(query)
          .flatMap(AsyncN1qlQueryResult::rows)

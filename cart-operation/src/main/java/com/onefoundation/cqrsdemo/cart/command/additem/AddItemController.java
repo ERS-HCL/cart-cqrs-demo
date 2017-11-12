@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.onefoundation.cqrsdemo.cart.CartAggregate;
-import com.onefoundation.cqrsdemo.cart.command.Event;
+import com.hcl.ers.demo.cqrs.event.Event;
+import com.onefoundation.cqrsdemo.cart.model.CartAggregate;
 import com.onefoundation.cqrsdemo.cart.store.EventStore;
 
 @RestController

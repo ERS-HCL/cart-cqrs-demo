@@ -1,4 +1,4 @@
-package com.onefoundation.cqrsdemo.cart;
+package com.onefoundation.cqrsdemo.cart.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,14 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.onefoundation.cqrsdemo.cart.command.Event;
+import com.hcl.ers.demo.cqrs.event.Event;
+import com.hcl.ers.demo.cqrs.event.cart.v1.ItemAddedEvent;
+import com.hcl.ers.demo.cqrs.event.cart.v1.ItemUpdatedEvent;
 import com.onefoundation.cqrsdemo.cart.command.additem.AddItemCommand;
-import com.onefoundation.cqrsdemo.cart.command.additem.ItemAddedEvent;
-import com.onefoundation.cqrsdemo.cart.command.removeitem.ItemUpdatedEvent;
 import com.onefoundation.cqrsdemo.cart.command.removeitem.UpdateItemCommand;
-import com.onefoundation.cqrsdemo.cart.store.Cart;
 import com.onefoundation.cqrsdemo.cart.store.CartEventNumber;
-import com.onefoundation.cqrsdemo.cart.store.CartItem;
 import com.onefoundation.cqrsdemo.cart.store.CartStore;
 import com.onefoundation.cqrsdemo.cart.store.EventStore;
 

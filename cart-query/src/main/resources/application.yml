@@ -3,7 +3,7 @@ spring:
     name: cart-operation
 
 server:  
-  port: ${PORT:8080}
+  port: ${PORT:8181}
 
 couchbase:
   connectionString: couchbase://localhost

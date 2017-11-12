@@ -1,11 +1,13 @@
-package com.onefoundation.cqrsdemo.cart.store;
+package com.onefoundation.cqrsdemo.cart.model;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import com.onefoundation.cqrsdemo.cart.store.DocTypes;
+
 public class Cart {
 	
-	private String docType = DocTypes.Cart.name();
+	private String docType = DocTypes.CartAggregateView.name();
 	
 	private String id;
 	private Map<String, CartItem> items = new HashMap<String, CartItem>();
