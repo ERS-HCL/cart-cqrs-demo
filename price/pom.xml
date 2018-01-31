@@ -15,12 +15,6 @@
 
 		<dependency>
 			<groupId>com.hcl.ers.online.ecommerce</groupId>
-			<artifactId>events</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>com.hcl.ers.online.ecommerce</groupId>
 			<artifactId>eventstore</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>

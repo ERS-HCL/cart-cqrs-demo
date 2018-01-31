@@ -3,11 +3,13 @@ package com.hcl.ers.online.ecommerce.eventstore;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Component
 public class JsonMapper {
-	private static ObjectMapper mapper = new ObjectMapper();
+	
+	private static ObjectMapper mapper = new ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	
 	public <T> T toObject(String json, Class<T> klass) {
 		T cart = null;

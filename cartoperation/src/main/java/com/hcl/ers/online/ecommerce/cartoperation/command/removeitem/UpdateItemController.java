@@ -14,15 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hcl.ers.online.ecommerce.cartoperation.model.CartAggregate;
-import com.hcl.ers.online.ecommerce.cartoperation.store.EventStore;
 import com.hcl.ers.online.ecommerce.event.Event;
+import com.hcl.ers.online.ecommerce.eventstore.Store;
 
 @RestController
 public class UpdateItemController {
 	@Autowired
 	private ApplicationContext applicationContext;
 	@Autowired
-	EventStore eventStore;
+	Store store;
 	ObjectMapper mapper = new ObjectMapper();
 	
 	@RequestMapping(value = "/ms/cartoperation/{cartId}/item/update", method=RequestMethod.POST)
@@ -30,7 +30,7 @@ public class UpdateItemController {
 	public Object handle(@PathVariable("cartId") String cartId, @RequestBody UpdateItemCommand updateItemCommand) {
 		CartAggregate cart = applicationContext.getBean(CartAggregate.class, cartId);
 		List<Event> events = cart.handle(updateItemCommand);
-		eventStore.save(events);
+		store.insertEvent(events);
 		
 		cart.refresh();
 		return cart.getCart();

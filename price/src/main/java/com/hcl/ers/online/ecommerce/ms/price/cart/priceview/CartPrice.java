@@ -4,11 +4,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.hcl.ers.online.ecommerce.ms.price.store.DocTypes;
-
 public class CartPrice {
 	
-	public static String docType = DocTypes.PriceMsCartPriceView.name();
 	private String id;
 	private float totalAmount;
 	private Map<String, CartItemPrice> itemMap = new HashMap<String, CartItemPrice>();
@@ -36,14 +33,6 @@ public class CartPrice {
 	
 	public void addItemPrice(CartItemPrice cartItemPrice) {
 		itemMap.put(cartItemPrice.getSkuId(), cartItemPrice);
-	}
-
-	public String getDocType() {
-		return docType;
-	}
-
-	public void setDocType(String docType) {
-		this.docType = docType;
 	}
 
 	public float getTotalAmount() {

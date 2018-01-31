@@ -1,7 +1,9 @@
 package com.hcl.ers.online.ecommerce.cartoperation.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
@@ -11,12 +13,11 @@ import org.springframework.stereotype.Service;
 
 import com.hcl.ers.online.ecommerce.cartoperation.command.additem.AddItemCommand;
 import com.hcl.ers.online.ecommerce.cartoperation.command.removeitem.UpdateItemCommand;
-import com.hcl.ers.online.ecommerce.cartoperation.store.CartEventNumber;
-import com.hcl.ers.online.ecommerce.cartoperation.store.CartStore;
-import com.hcl.ers.online.ecommerce.cartoperation.store.EventStore;
 import com.hcl.ers.online.ecommerce.event.Event;
 import com.hcl.ers.online.ecommerce.event.cart.v1.ItemAddedEvent;
 import com.hcl.ers.online.ecommerce.event.cart.v1.ItemUpdatedEvent;
+import com.hcl.ers.online.ecommerce.eventstore.CartEventNumber;
+import com.hcl.ers.online.ecommerce.eventstore.Store;
 
 @Service
 @Scope("prototype")
@@ -25,10 +26,8 @@ public class CartAggregate {
 	@Autowired
 	private CartEventNumber cartEventNumber;
 	@Autowired
-	CartStore cartStore;
+	Store store;
 	private Cart cart;
-	@Autowired
-	EventStore eventStore;
 	String cartId;
 	
 	public CartAggregate(String cartId) {
@@ -40,13 +39,15 @@ public class CartAggregate {
 	}
 	
 	public void refresh() {
-		List<Event> events = eventStore.getCartEvents(cart.getId(), cart.getSnapshotEventNumber());
+		Map<String, String> tags = new HashMap<String, String>();
+		tags.put("cartId", cart.getId());
+		List<Event> events = store.getEvents(tags, cart.getSnapshotEventNumber());
 		if(!events.isEmpty()) {
 			for (Event e : events) {
 				apply(e);
 			}
 		}
-		cartStore.save(cart);
+		store.upsertAggregate(cart.getId(), cart);
 	}
 	
 	public void apply(Event event) {
@@ -97,8 +98,9 @@ public class CartAggregate {
 		List<Event> events = new ArrayList<Event>();
 		
 		ItemAddedEvent event = new ItemAddedEvent();
-		event.setSequenceNumber(cartEventNumber.getNextEventNumber());
-		event.setCartId(cart.getId());
+		event.setEventNumber(cartEventNumber.getNextEventNumber());
+		
+		event.setTags(createTag(cart.getId()));
 		event.setQuantity(command.getQuantity());
 		event.setSkuId(command.getSkuId());
 		
@@ -123,8 +125,8 @@ public class CartAggregate {
 		List<Event> events = new ArrayList<Event>();
 		
 		ItemUpdatedEvent event = new ItemUpdatedEvent();
-		event.setSequenceNumber(cartEventNumber.getNextEventNumber());
-		event.setCartId(cart.getId());
+		event.setEventNumber(cartEventNumber.getNextEventNumber());
+		event.setTags(createTag(cart.getId()));
 		event.setQuantity(command.getQuantity());
 		event.setSkuId(command.getSkuId());
 
@@ -133,9 +135,15 @@ public class CartAggregate {
 
 	}
 	
+	private Map<String, String> createTag(String cartId) {
+		Map<String, String> tags = new HashMap<String, String>();
+		tags.put("cartId", cartId);
+		return tags;
+	}
+	
 	@PostConstruct
 	private void init() {
-		cart = cartStore.get(cartId);
+		cart = store.getAggregate(cartId, Cart.class);
 		if (cart == null) {
 			cart = new Cart(cartId);
 		}

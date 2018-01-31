@@ -1,6 +1,8 @@
 package com.hcl.ers.online.ecommerce.cartview.model;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
@@ -8,21 +10,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.hcl.ers.online.ecommerce.cartview.store.CartStore;
-import com.hcl.ers.online.ecommerce.cartview.store.EventStore;
 import com.hcl.ers.online.ecommerce.event.Event;
 import com.hcl.ers.online.ecommerce.event.cart.v1.ItemAddedEvent;
 import com.hcl.ers.online.ecommerce.event.cart.v1.ItemUpdatedEvent;
+import com.hcl.ers.online.ecommerce.eventstore.Store;
 
 @Service
 @Scope("prototype")
 public class CartView {
 	
 	@Autowired
-	CartStore cartStore;
+	private Store store;
+	
 	private Cart cart;
-	@Autowired
-	EventStore eventStore;
 	String cartId;
 	
 	public CartView(String cartId) {
@@ -34,13 +34,15 @@ public class CartView {
 	}
 	
 	public void refresh() {
-		List<Event> events = eventStore.getCartEvents(cart.getId(), cart.getSnapshotEventNumber());
+		Map<String, String> tags = new HashMap<String, String>();
+		tags.put("cartId", cart.getId());
+		List<Event> events = store.getEvents(tags, cart.getSnapshotEventNumber());
 		if(!events.isEmpty()) {
 			for (Event e : events) {
 				apply(e);
 			}
 		}
-		cartStore.save(cart);
+		store.upsertAggregate(cart.getId(), cart);
 	}
 	
 	public void apply(Event event) {
@@ -80,7 +82,7 @@ public class CartView {
 		
 	@PostConstruct
 	private void init() {
-		cart = cartStore.get(cartId);
+		cart = store.getAggregate(cartId, Cart.class);
 		if (cart == null) {
 			cart = new Cart(cartId);
 		}

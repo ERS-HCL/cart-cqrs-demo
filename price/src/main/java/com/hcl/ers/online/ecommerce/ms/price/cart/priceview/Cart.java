@@ -5,11 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.hcl.ers.online.ecommerce.ms.price.store.DocTypes;
 
 public class Cart {
-	
-	public static String docType = DocTypes.PriceMsCartView.name();
 	
 	private String id;
 	private Map<String, CartItem> itemMap = new HashMap<String, CartItem>();
@@ -20,10 +17,6 @@ public class Cart {
 	
 	public Cart(String id) {
 		this.id = id;
-	}
-
-	public String getDocType() {
-		return docType;
 	}
 
 	public String getId() {
@@ -41,10 +34,6 @@ public class Cart {
 
 	public long getSnapshotEventNumber() {
 		return snapshotEventNumber;
-	}
-
-	public void setDocType(String docType) {
-		this.docType = docType;
 	}
 
 	public void setId(String id) {

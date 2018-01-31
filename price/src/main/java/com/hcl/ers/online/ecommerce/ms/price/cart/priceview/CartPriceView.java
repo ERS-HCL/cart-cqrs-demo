@@ -1,6 +1,8 @@
 package com.hcl.ers.online.ecommerce.ms.price.cart.priceview;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -9,8 +11,8 @@ import org.springframework.stereotype.Service;
 import com.hcl.ers.online.ecommerce.event.Event;
 import com.hcl.ers.online.ecommerce.event.cart.v1.ItemAddedEvent;
 import com.hcl.ers.online.ecommerce.event.cart.v1.ItemUpdatedEvent;
+import com.hcl.ers.online.ecommerce.eventstore.Store;
 import com.hcl.ers.online.ecommerce.ms.price.cart.CartPriceService;
-import com.hcl.ers.online.ecommerce.ms.price.store.Store;
 
 @Service
 @Scope("prototype")
@@ -28,8 +30,8 @@ public class CartPriceView {
 	
 	public void load(String cartId) {
 		this.cartId = cartId;
-		cart = store.get(cartId, Cart.docType, Cart.class);
-		cartPrice = store.get(cartId, CartPrice.docType, CartPrice.class);
+		cart = store.getAggregate(cartId, Cart.class);
+		cartPrice = store.getAggregate(cartId, CartPrice.class);
 		if (cart == null) {
 			cart = new Cart(cartId);
 		}
@@ -45,15 +47,17 @@ public class CartPriceView {
 	}
 	
 	public void refresh() {
-		List<Event> events = store.getCartEvents(cart.getId(), cart.getSnapshotEventNumber());
+		Map<String, String> tags = new HashMap<String, String>();
+		tags.put("cartId", cart.getId());
+		List<Event> events = store.getEvents(tags, cart.getSnapshotEventNumber());
 		if(!events.isEmpty()) {
 			for (Event e : events) {
 				apply(e);
 			}
 			
 			cartPrice = cartPriceService.calculatePrice(cart);
-			store.upsert(cart.getId(), cart);
-			store.upsert(cart.getId(), cartPrice);
+			store.upsertAggregate(cart.getId(), cart);
+			store.upsertAggregate(cart.getId(), cartPrice);
 		}
 		
 	}

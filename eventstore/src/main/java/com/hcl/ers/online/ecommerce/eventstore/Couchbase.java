@@ -7,14 +7,13 @@ import java.util.function.Function;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.CouchbaseCluster;
-import com.couchbase.client.java.document.RawJsonDocument;
+import com.couchbase.client.java.document.JsonDocument;
 import com.couchbase.client.java.document.json.JsonObject;
 import com.couchbase.client.java.query.AsyncN1qlQueryResult;
 import com.couchbase.client.java.query.N1qlParams;
@@ -22,9 +21,6 @@ import com.couchbase.client.java.query.N1qlQuery;
 
 @Component
 public class Couchbase {
-	
-	@Autowired
-	private JsonMapper jsonMapper;
 	
 	Cluster cluster = null;
 	Bucket bucket = null;
@@ -44,14 +40,12 @@ public class Couchbase {
 		return bucket;
 	}
 	
-	public void upsert(String id, Object object) {
-		RawJsonDocument jsonDoc = RawJsonDocument.create(id, jsonMapper.toString(object));
-		bucket.upsert(jsonDoc);
+	public void upsert(String id, JsonObject object) {
+		bucket.upsert(JsonDocument.create(id, object));
 	}
 	
-	public void insert(String id, Object object) {
-		RawJsonDocument jsonDoc = RawJsonDocument.create(id, jsonMapper.toString(object));
-		bucket.insert(jsonDoc);
+	public void insert(String id, JsonObject object) {
+		bucket.insert(JsonDocument.create(id, object));
 	}
 	
 
