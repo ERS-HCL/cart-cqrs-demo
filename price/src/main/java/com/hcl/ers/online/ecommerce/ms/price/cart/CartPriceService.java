@@ -22,6 +22,7 @@ public class CartPriceService {
 			cartTotal += itemTotal;
 			cartItemPrice.setPrice(itemTotal);
 			cartPrice.addItemPrice(cartItemPrice);
+			cartPrice.setTotalAmount(cartTotal);
 		}
 		
 		return cartPrice;
